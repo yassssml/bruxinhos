@@ -79,6 +79,19 @@ const getBruxosById = (req, res) => {
         });
     }
 
+    const nomeExiste = bruxos.some(
+        (b) => b.nome.toLowerCase() === nome.toLowerCase()
+      );
+    
+      if (nomeExiste) {
+        return res.status(409).json({
+          status: 409,
+          success: false,
+          message: "Já existe um bruxo com esse nome!",
+          suggestions: ["Escolha outro nome para seu bruxo!"],
+        });
+      }
+
     const novoBruxo = {
         id: bruxos.length + 1,
         nome: nome,
@@ -100,7 +113,7 @@ const getBruxosById = (req, res) => {
 }
 
 const deleteBruxo = (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
 
     if (isNaN(id)) {
         return res.status(400).json({
@@ -109,24 +122,28 @@ const deleteBruxo = (req, res) => {
         });
     }
 
-const idParaApagar = parseInt(id)
+    // A variável correta para usar na filtragem
+    const idParaApagar = parseInt(id); 
 
-const BruxoParaRemover = bruxos.find(b => b.id === idParaApagar);
+    const BruxoParaRemover = bruxos.find(b => b.id === idParaApagar);
 
-if (!BruxoParaRemover) {
-    return res.status(404).json({
-        success: false,
-        message: "Bruxo id não existe"
-    });
-}
-const BruxoFiltrado = bruxos.filter(b => b.id !== id);
+    if (!BruxoParaRemover) {
+        return res.status(404).json({
+            success: false,
+            message: "Bruxo id não existe"
+        });
+    }
+    
+    // CORREÇÃO: Comparar b.id (número) com idParaApagar (número)
+    const BruxoFiltrado = bruxos.filter(b => b.id !== idParaApagar); 
 
-bruxos.splice(0, bruxos.length, ...BruxoFiltrado);
+    // Atualiza o array 'bruxos' no escopo global (se 'bruxos' for um array mutável)
+    bruxos.splice(0, bruxos.length, ...BruxoFiltrado);
 
-return res.status(200).json({
-    success: true,
-    message: "Bruxo expulso de Hogwarts com sucesso!"
-})
+    return res.status(200).json({
+        success: true,
+        message: "Bruxo expulso de Hogwarts com sucesso!"
+    })
 }
 
 const updateBruxo = (req, res) => {
